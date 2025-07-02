@@ -252,10 +252,10 @@ const HomePage = () => {
               Your trusted companion for mental wellness and emotional growth.
             </p>
             <div className="flex justify-center space-x-6 text-sm text-gray-400">
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-white transition-colors">Support</a>
-              <a href="#" className="hover:text-white transition-colors">Contact</a>
+              <span className="hover:text-white transition-colors cursor-pointer">Privacy Policy</span>
+              <span className="hover:text-white transition-colors cursor-pointer">Terms of Service</span>
+              <span className="hover:text-white transition-colors cursor-pointer">Support</span>
+              <span className="hover:text-white transition-colors cursor-pointer">Contact</span>
             </div>
             <div className="mt-6 pt-6 border-t border-gray-700 text-sm text-gray-400">
               <p>&copy; 2024 MindCare. Made with 💙 for better mental health.</p>

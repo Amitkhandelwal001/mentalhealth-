@@ -9,6 +9,8 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
+import MoodCheckInPage from './pages/MoodCheckInPage';
+import MoodHistoryPage from './pages/MoodHistoryPage';
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
             
             {/* Protected Routes */}
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/mood-checkin" element={<MoodCheckInPage />} />
+            <Route path="/mood-history" element={<MoodHistoryPage />} />
             
             {/* Catch all route - redirect to home */}
             <Route path="*" element={<Navigate to="/" replace />} />
