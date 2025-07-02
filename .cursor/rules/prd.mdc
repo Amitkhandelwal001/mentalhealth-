@@ -1,0 +1,696 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Mental Health Companion - Product Requirements Document & Development Guide
+
+## 1. Executive Summary
+
+**Project Name:** MindCare - Mental Health Companion  
+**Team Size:** 3 developers (beginner level)  
+**Timeline:** 8-12 weeks  
+**Platform:** Web application (responsive design)
+
+### Problem Statement
+Rising stress and anxiety levels among youth require accessible mental health support. Current solutions are often expensive, intimidating, or lack personalization.
+
+### Solution
+A digital platform offering mood tracking, AI-driven personalized self-care recommendations, anonymous peer support, and gamified wellness habits.
+
+---
+
+## 2. Product Vision & Goals
+
+### Primary Goals
+- Help users track and understand their mental health patterns
+- Provide personalized, actionable self-care recommendations
+- Create a safe, anonymous community for peer support
+- Encourage consistent self-care through gamification
+
+### Success Metrics
+- User retention rate > 60% after 30 days
+- Daily active users performing mood check-ins
+- Positive user feedback on AI recommendations
+- Community engagement in peer support features
+
+---
+
+## 3. Target Audience
+
+**Primary Users:** Young adults (18-35) experiencing stress, anxiety, or seeking mental wellness support
+**Secondary Users:** Anyone interested in mental health tracking and self-care
+
+### User Personas
+1. **Sarah (22, College Student):** High stress from academics, needs quick stress relief techniques
+2. **Mike (28, Working Professional):** Burnout from work, wants to track mood patterns
+3. **Alex (25, Freelancer):** Irregular schedule, needs flexible self-care routines
+
+---
+
+## 4. Feature Requirements
+
+### 4.1 Core Features (MVP)
+
+#### Mood Tracking System
+- **Daily Mood Check-ins**
+  - 5-point scale with emoji representation
+  - Optional notes/tags for mood context
+  - Time-based entries (morning, afternoon, evening)
+
+#### AI-Driven Activity Suggestions
+- **Personalized Recommendations**
+  - Breathing exercises (guided audio/visual)
+  - Journaling prompts based on mood
+  - Physical activities (stretching, walking)
+  - Mindfulness exercises
+
+#### Anonymous Peer Support
+- **Community Features**
+  - Anonymous posts about feelings/experiences
+  - Supportive comments (moderated)
+  - Topic-based discussion rooms
+  - Crisis support resources
+
+#### User Dashboard
+- **Progress Visualization**
+  - Mood trends over time (charts/graphs)
+  - Activity completion tracking
+  - Streak counters for consistency
+
+### 4.2 Advanced Features (Phase 2)
+
+#### Gamification System
+- Points for daily check-ins and activities
+- Achievement badges for milestones
+- Weekly challenges
+- Progress levels
+
+#### Wearable Integration
+- Heart rate data for stress detection
+- Sleep pattern correlation with mood
+- Activity level tracking
+
+---
+
+## 5. Technical Architecture
+
+### 5.1 Technology Stack (Beginner-Friendly)
+
+#### Frontend
+- **Framework:** React.js with Create React App
+- **Styling:** Tailwind CSS
+- **State Management:** React Context API + useState/useReducer
+- **Charts:** Chart.js or Recharts
+- **HTTP Client:** Axios
+
+#### Backend
+- **Runtime:** Node.js
+- **Framework:** Express.js
+- **Database:** MongoDB with Mongoose ODM
+- **Authentication:** JWT (JSON Web Tokens)
+- **File Storage:** Local storage (Phase 1), Cloudinary (Phase 2)
+
+#### Development Tools
+- **Version Control:** Git + GitHub
+- **API Testing:** Postman
+- **Database GUI:** MongoDB Compass
+- **Deployment:** Netlify (Frontend) + Heroku/Railway (Backend)
+
+### 5.2 System Architecture
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Frontend      │    │   Backend API   │    │   Database      │
+│   (React)       │◄──►│   (Express.js)  │◄──►│   (MongoDB)     │
+│                 │    │                 │    │                 │
+│ - Components    │    │ - Routes        │    │ - Collections   │
+│ - State Mgmt    │    │ - Middleware    │    │ - Schemas       │
+│ - API Calls     │    │ - Controllers   │    │ - Indexes       │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
+
+---
+
+## 6. Database Schema Design
+
+### 6.1 Collections Overview
+
+#### Users Collection
+```javascript
+{
+  _id: ObjectId,
+  username: String, // unique, 3-20 characters
+  email: String, // unique, validated
+  passwordHash: String, // bcrypt hashed
+  profile: {
+    displayName: String, // can be anonymous
+    avatar: String, // default emoji
+    joinDate: Date,
+    timezone: String
+  },
+  preferences: {
+    notifications: Boolean,
+    publicProfile: Boolean, // for community features
+    reminderTime: String // for daily check-ins
+  },
+  stats: {
+    totalCheckIns: Number,
+    currentStreak: Number,
+    longestStreak: Number,
+    points: Number,
+    level: Number
+  },
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### MoodEntries Collection
+```javascript
+{
+  _id: ObjectId,
+  userId: ObjectId, // reference to Users
+  moodScore: Number, // 1-5 scale
+  moodEmoji: String, // 😢😕😐🙂😊
+  notes: String, // optional user notes
+  tags: [String], // ["work", "family", "health"]
+  timeOfDay: String, // "morning", "afternoon", "evening"
+  date: Date, // date without time for daily aggregation
+  createdAt: Date
+}
+```
+
+#### Activities Collection
+```javascript
+{
+  _id: ObjectId,
+  name: String, // "Deep Breathing Exercise"
+  category: String, // "breathing", "journaling", "physical"
+  description: String,
+  instructions: [String], // step-by-step guide
+  duration: Number, // in minutes
+  difficultyLevel: String, // "beginner", "intermediate", "advanced"
+  tags: [String], // for recommendation matching
+  isActive: Boolean
+}
+```
+
+#### UserActivities Collection (Tracking)
+```javascript
+{
+  _id: ObjectId,
+  userId: ObjectId,
+  activityId: ObjectId,
+  completedAt: Date,
+  rating: Number, // 1-5, how helpful was this?
+  notes: String, // optional feedback
+  duration: Number // actual time spent
+}
+```
+
+#### CommunityPosts Collection
+```javascript
+{
+  _id: ObjectId,
+  authorId: ObjectId, // but displayed anonymously
+  title: String,
+  content: String,
+  category: String, // "support", "celebration", "question"
+  tags: [String],
+  isAnonymous: Boolean, // always true for privacy
+  likes: Number,
+  commentCount: Number,
+  isModerated: Boolean,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### Comments Collection
+```javascript
+{
+  _id: ObjectId,
+  postId: ObjectId,
+  authorId: ObjectId,
+  content: String,
+  likes: Number,
+  isModerated: Boolean,
+  createdAt: Date
+}
+```
+
+---
+
+## 7. API Design
+
+### 7.1 Authentication Endpoints
+
+```
+POST /api/auth/register
+- Body: { username, email, password }
+- Response: { user, token }
+
+POST /api/auth/login
+- Body: { email, password }
+- Response: { user, token }
+
+POST /api/auth/logout
+- Headers: Authorization: Bearer <token>
+- Response: { message }
+
+GET /api/auth/me
+- Headers: Authorization: Bearer <token>
+- Response: { user }
+```
+
+### 7.2 Mood Tracking Endpoints
+
+```
+POST /api/mood
+- Headers: Authorization: Bearer <token>
+- Body: { moodScore, notes?, tags?, timeOfDay }
+- Response: { moodEntry }
+
+GET /api/mood
+- Headers: Authorization: Bearer <token>
+- Query: ?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD&limit=30
+- Response: { moodEntries, stats }
+
+GET /api/mood/trends
+- Headers: Authorization: Bearer <token>
+- Query: ?period=week|month|year
+- Response: { trends, insights }
+
+PUT /api/mood/:id
+- Headers: Authorization: Bearer <token>
+- Body: { moodScore?, notes?, tags? }
+- Response: { moodEntry }
+
+DELETE /api/mood/:id
+- Headers: Authorization: Bearer <token>
+- Response: { message }
+```
+
+### 7.3 Activities Endpoints
+
+```
+GET /api/activities
+- Query: ?category=breathing&difficulty=beginner
+- Response: { activities }
+
+GET /api/activities/recommendations
+- Headers: Authorization: Bearer <token>
+- Response: { recommendedActivities }
+
+POST /api/activities/:id/complete
+- Headers: Authorization: Bearer <token>
+- Body: { rating?, notes?, duration? }
+- Response: { userActivity, pointsEarned }
+
+GET /api/activities/history
+- Headers: Authorization: Bearer <token>
+- Query: ?limit=20&page=1
+- Response: { userActivities, pagination }
+```
+
+### 7.4 Community Endpoints
+
+```
+GET /api/community/posts
+- Query: ?category=support&page=1&limit=10
+- Response: { posts, pagination }
+
+POST /api/community/posts
+- Headers: Authorization: Bearer <token>
+- Body: { title, content, category, tags }
+- Response: { post }
+
+GET /api/community/posts/:id
+- Response: { post, comments }
+
+POST /api/community/posts/:id/like
+- Headers: Authorization: Bearer <token>
+- Response: { likes }
+
+POST /api/community/posts/:id/comments
+- Headers: Authorization: Bearer <token>
+- Body: { content }
+- Response: { comment }
+```
+
+### 7.5 User Profile Endpoints
+
+```
+GET /api/users/profile
+- Headers: Authorization: Bearer <token>
+- Response: { profile, stats }
+
+PUT /api/users/profile
+- Headers: Authorization: Bearer <token>
+- Body: { displayName?, preferences? }
+- Response: { profile }
+
+GET /api/users/stats
+- Headers: Authorization: Bearer <token>
+- Response: { stats, achievements }
+```
+
+---
+
+## 8. Frontend Component Structure
+
+### 8.1 Component Hierarchy
+
+```
+App
+├── Routes (React Router)
+├── Navbar
+├── Pages/
+│   ├── HomePage
+│   ├── LoginPage
+│   ├── RegisterPage
+│   ├── DashboardPage
+│   │   ├── MoodCheckIn
+│   │   ├── MoodChart
+│   │   ├── ActivitySuggestions
+│   │   └── StreakCounter
+│   ├── MoodHistoryPage
+│   ├── ActivitiesPage
+│   │   ├── ActivityCard
+│   │   └── ActivityDetail
+│   ├── CommunityPage
+│   │   ├── PostCard
+│   │   ├── CreatePost
+│   │   └── PostDetail
+│   └── ProfilePage
+└── Components/
+    ├── Common/
+    │   ├── Button
+    │   ├── Input
+    │   ├── Modal
+    │   └── Loading
+    ├── Charts/
+    │   ├── MoodLineChart
+    │   └── WeeklyBarChart
+    └── Forms/
+        ├── MoodForm
+        ├── PostForm
+        └── ProfileForm
+```
+
+### 8.2 Key Component Examples
+
+#### MoodCheckIn Component
+```javascript
+// Allows users to record daily mood
+const MoodCheckIn = () => {
+  const [mood, setMood] = useState(3);
+  const [notes, setNotes] = useState('');
+  const [timeOfDay, setTimeOfDay] = useState('morning');
+  
+  const handleSubmit = async () => {
+    // API call to save mood entry
+    // Update user stats
+    // Show success message
+  };
+
+  return (
+    // Mood selector (emoji buttons)
+    // Notes textarea
+    // Time of day selector
+    // Submit button
+  );
+};
+```
+
+#### ActivitySuggestions Component
+```javascript
+// Shows personalized activity recommendations
+const ActivitySuggestions = () => {
+  const [activities, setActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    // Fetch recommended activities based on recent mood
+    fetchRecommendations();
+  }, []);
+
+  return (
+    // List of activity cards
+    // "Complete Activity" buttons
+    // Progress indicators
+  );
+};
+```
+
+---
+
+## 9. Development Phases & Timeline
+
+### Phase 1: MVP Development (Weeks 1-6)
+
+#### Week 1-2: Setup & Authentication
+- [ ] Project setup (React + Express + MongoDB)
+- [ ] Basic UI components and routing
+- [ ] User registration/login system
+- [ ] JWT authentication middleware
+
+#### Week 3-4: Core Features
+- [ ] Mood tracking functionality
+- [ ] Basic dashboard with mood history
+- [ ] Simple activity recommendations
+- [ ] Data visualization (mood charts)
+
+#### Week 5-6: Community Features
+- [ ] Anonymous posting system
+- [ ] Comment functionality
+- [ ] Basic moderation tools
+- [ ] UI polish and responsive design
+
+### Phase 2: Enhancement (Weeks 7-8)
+
+#### Week 7: Gamification
+- [ ] Points and streak system
+- [ ] Achievement badges
+- [ ] User levels and progress
+
+#### Week 8: Testing & Deployment
+- [ ] Comprehensive testing
+- [ ] Bug fixes and optimization
+- [ ] Deployment setup
+- [ ] Documentation
+
+---
+
+## 10. Team Structure & Responsibilities
+
+### Developer 1: Frontend Lead
+- React components and UI/UX
+- State management
+- API integration
+- Responsive design
+
+### Developer 2: Backend Lead
+- Express.js API development
+- Database schema and operations
+- Authentication system
+- API documentation
+
+### Developer 3: Full-Stack Support
+- Feature integration
+- Testing and quality assurance
+- Deployment and DevOps
+- Documentation
+
+---
+
+## 11. Development Setup Guide
+
+### 11.1 Prerequisites
+```bash
+# Install Node.js (v16 or higher)
+# Install MongoDB (local or MongoDB Atlas)
+# Install Git
+# Code editor (VS Code recommended)
+```
+
+### 11.2 Project Structure
+```
+mindcare-app/
+├── frontend/                 # React application
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── context/
+│   │   ├── utils/
+│   │   └── App.js
+│   └── package.json
+├── backend/                  # Express.js API
+│   ├── controllers/
+│   ├── models/
+│   ├── routes/
+│   ├── middleware/
+│   ├── utils/
+│   └── server.js
+└── README.md
+```
+
+### 11.3 Setup Commands
+```bash
+# Clone repository
+git clone <your-repo-url>
+cd mindcare-app
+
+# Backend setup
+cd backend
+npm init -y
+npm install express mongoose bcryptjs jsonwebtoken cors dotenv
+npm install -D nodemon
+
+# Frontend setup
+cd ../frontend
+npx create-react-app .
+npm install axios react-router-dom chart.js react-chartjs-2
+
+# Environment variables
+# Create .env files in both frontend and backend directories
+```
+
+---
+
+## 12. Security & Privacy Considerations
+
+### 12.1 Data Protection
+- All user data encrypted at rest
+- HTTPS for all API communications
+- JWT tokens with expiration
+- Password hashing with bcrypt
+
+### 12.2 Privacy Features
+- Anonymous community posting
+- Optional data deletion
+- Minimal data collection
+- Clear privacy policy
+
+### 12.3 Content Moderation
+- Automated keyword filtering
+- User reporting system
+- Manual review queue
+- Crisis intervention resources
+
+---
+
+## 13. Testing Strategy
+
+### 13.1 Backend Testing
+- Unit tests for API endpoints
+- Database connection testing
+- Authentication flow testing
+- Error handling validation
+
+### 13.2 Frontend Testing
+- Component unit tests
+- User interaction testing
+- Responsive design testing
+- Cross-browser compatibility
+
+---
+
+## 14. Deployment Guide
+
+### 14.1 Backend Deployment (Heroku/Railway)
+```bash
+# Create Procfile
+echo "web: node server.js" > Procfile
+
+# Environment variables
+DATABASE_URL=mongodb://...
+JWT_SECRET=your-secret-key
+PORT=process.env.PORT || 5000
+```
+
+### 14.2 Frontend Deployment (Netlify)
+```bash
+# Build command
+npm run build
+
+# Publish directory
+build/
+
+# Environment variables
+REACT_APP_API_URL=https://your-backend-url.herokuapp.com
+```
+
+---
+
+## 15. Success Metrics & KPIs
+
+### User Engagement
+- Daily active users
+- Daily mood check-in rate
+- Activity completion rate
+- Community post engagement
+
+### Health Impact
+- User-reported mood improvement
+- Consistency in self-care activities
+- Time spent on app per session
+- Feature usage analytics
+
+---
+
+## 16. Future Enhancements
+
+### Advanced AI Features
+- Mood prediction algorithms
+- Personalized content curation
+- Crisis detection and intervention
+- Integration with mental health professionals
+
+### Wearable Integration
+- Heart rate variability monitoring
+- Sleep quality correlation
+- Stress level detection
+- Automated activity suggestions
+
+### Social Features
+- Friend connections (optional)
+- Group challenges
+- Peer mentorship programs
+- Expert-moderated discussions
+
+---
+
+## 17. Resources for Beginners
+
+### Learning Materials
+- **React:** Official React documentation, freeCodeCamp
+- **Node.js:** Node.js guides, Express.js documentation
+- **MongoDB:** MongoDB University, Mongoose documentation
+- **General:** MDN Web Docs, Stack Overflow
+
+### Recommended Tools
+- **Code Editor:** Visual Studio Code
+- **API Testing:** Postman or Insomnia
+- **Database:** MongoDB Compass
+- **Version Control:** GitHub Desktop (for beginners)
+
+---
+
+## 18. Risk Assessment & Mitigation
+
+### Technical Risks
+- **Database Performance:** Implement proper indexing
+- **API Rate Limiting:** Use middleware for protection
+- **Data Loss:** Regular backups and version control
+
+### Business Risks
+- **User Privacy:** Strict data handling policies
+- **Content Moderation:** Automated and manual review systems
+- **Crisis Situations:** Clear escalation procedures and resources
+
+---
+
+This comprehensive guide provides everything your team needs to build the Mental Health Companion app. Start with the MVP features and gradually add complexity as your skills develop. Remember to prioritize user privacy and well-being throughout the development process.
