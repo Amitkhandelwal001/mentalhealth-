@@ -8,6 +8,7 @@ import {
   validateMoodEntry,
   getMoodRecommendations
 } from '../../utils/moodData';
+import { showMoodSuccess, showMoodError, showValidationError } from '../../utils/toast';
 
 const MoodCheckIn = ({ onSuccess, onCancel, existingEntry = null }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -97,6 +98,16 @@ const MoodCheckIn = ({ onSuccess, onCancel, existingEntry = null }) => {
     const validation = validateMoodEntry(formData);
     if (!validation.isValid) {
       setErrors(validation.errors);
+      
+      // Show validation error toast
+      if (validation.errors.moodScore) {
+        showValidationError('mood');
+      } else if (validation.errors.notes) {
+        showValidationError('content');
+      } else {
+        showValidationError('required');
+      }
+      
       return;
     }
 
@@ -109,6 +120,9 @@ const MoodCheckIn = ({ onSuccess, onCancel, existingEntry = null }) => {
         : await moodAPI.createMoodEntry(formData);
 
       if (response.data.success) {
+        // Show success toast
+        showMoodSuccess(existingEntry ? 'update' : 'create');
+        
         setSuccessMessage(
           existingEntry 
             ? 'Mood entry updated successfully!' 
@@ -128,9 +142,11 @@ const MoodCheckIn = ({ onSuccess, onCancel, existingEntry = null }) => {
       
       if (error.response?.status === 409) {
         // Duplicate entry error
+        const errorMessage = error.response.data.message;
         setErrors({
-          general: error.response.data.message
+          general: errorMessage
         });
+        showMoodError(errorMessage);
       } else if (error.response?.data?.errors) {
         // Validation errors from backend
         const backendErrors = {};
@@ -138,11 +154,13 @@ const MoodCheckIn = ({ onSuccess, onCancel, existingEntry = null }) => {
           backendErrors[err.path || 'general'] = err.msg;
         });
         setErrors(backendErrors);
+        showMoodError(error.response.data.message || 'Validation failed');
       } else {
         const apiError = handleApiError(error);
         setErrors({
           general: apiError.message
         });
+        showMoodError(apiError.message);
       }
     } finally {
       setIsSubmitting(false);

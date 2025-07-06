@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { communityAPI } from '../../utils/api';
+import { showCommunitySuccess, showCommunityError, showQuickSuccess } from '../../utils/toast';
 
 const CommentCard = ({ 
   comment, 
@@ -48,8 +49,13 @@ const CommentCard = ({
       if (onLike) {
         onLike(comment._id, response.data.data);
       }
+      
+      // Show quick success toast
+      showQuickSuccess(comment.isLiked ? 'Like removed' : 'Liked!');
+      
     } catch (error) {
       console.error('Error liking comment:', error);
+      showCommunityError('Failed to like comment');
     } finally {
       setIsProcessing(false);
     }
@@ -67,10 +73,13 @@ const CommentCard = ({
       if (onFlag) {
         onFlag(comment._id);
       }
-      alert('Comment has been flagged for review');
+      
+      // Show success toast
+      showCommunitySuccess('flag');
+      
     } catch (error) {
       console.error('Error flagging comment:', error);
-      alert('Error flagging comment. Please try again.');
+      showCommunityError('Failed to flag comment');
     } finally {
       setIsProcessing(false);
     }
@@ -87,9 +96,13 @@ const CommentCard = ({
       if (onDelete) {
         onDelete(comment._id);
       }
+      
+      // Show success toast
+      showCommunitySuccess('delete');
+      
     } catch (error) {
       console.error('Error deleting comment:', error);
-      alert('Error deleting comment. Please try again.');
+      showCommunityError('Failed to delete comment');
     } finally {
       setIsProcessing(false);
     }

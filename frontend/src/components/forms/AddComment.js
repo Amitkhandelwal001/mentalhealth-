@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { communityAPI } from '../../utils/api';
 import { containsCrisisKeywords, crisisResources } from '../../utils/communityData';
+import { showCommunitySuccess, showCommunityError, showValidationError, showCrisisAlert } from '../../utils/toast';
 
 const AddComment = ({ postId, onCommentAdded }) => {
   const { user } = useAuth();
@@ -17,6 +18,8 @@ const AddComment = ({ postId, onCommentAdded }) => {
     // Check for crisis keywords
     if (containsCrisisKeywords(value)) {
       setShowCrisisResources(true);
+      // Show crisis alert toast
+      showCrisisAlert();
     } else {
       setShowCrisisResources(false);
     }
@@ -26,17 +29,23 @@ const AddComment = ({ postId, onCommentAdded }) => {
     e.preventDefault();
     
     if (!user) {
-      setError('Please log in to add comments');
+      const errorMessage = 'Please log in to add comments';
+      setError(errorMessage);
+      showValidationError('required');
       return;
     }
 
     if (!comment.trim()) {
-      setError('Comment cannot be empty');
+      const errorMessage = 'Comment cannot be empty';
+      setError(errorMessage);
+      showValidationError('content');
       return;
     }
 
     if (comment.length > 1000) {
-      setError('Comment must be less than 1000 characters');
+      const errorMessage = 'Comment must be less than 1000 characters';
+      setError(errorMessage);
+      showValidationError('content');
       return;
     }
 
@@ -50,6 +59,9 @@ const AddComment = ({ postId, onCommentAdded }) => {
 
       const newComment = response.data.data;
       
+      // Show success toast
+      showCommunitySuccess('comment');
+      
       // Notify parent component
       if (onCommentAdded) {
         onCommentAdded(newComment);
@@ -61,7 +73,9 @@ const AddComment = ({ postId, onCommentAdded }) => {
 
     } catch (error) {
       console.error('Error adding comment:', error);
-      setError(error.response?.data?.message || 'Failed to add comment');
+      const errorMessage = error.response?.data?.message || 'Failed to add comment';
+      setError(errorMessage);
+      showCommunityError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

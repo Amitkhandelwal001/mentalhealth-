@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { showAuthSuccess } from '../../utils/toast';
 
 const Navigation = () => {
   const { user, logout } = useAuth();
@@ -8,6 +9,8 @@ const Navigation = () => {
 
   const handleLogout = async () => {
     await logout();
+    // Show logout success toast
+    showAuthSuccess('logout');
   };
 
   const isActive = (path) => {

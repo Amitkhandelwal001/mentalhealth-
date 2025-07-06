@@ -6,6 +6,7 @@ import {
   validatePassword, 
   getPasswordStrength 
 } from '../../utils/auth';
+import { showAuthSuccess, showAuthError, showValidationError } from '../../utils/toast';
 
 const RegisterForm = ({ onSuccess, redirectTo = '/dashboard' }) => {
   const { register, isLoading, error } = useAuth();
@@ -53,6 +54,19 @@ const RegisterForm = ({ onSuccess, redirectTo = '/dashboard' }) => {
     const validation = validateRegistrationForm(formData);
     if (!validation.isValid) {
       setFormErrors(validation.errors);
+      
+      // Show validation error toast
+      const firstError = Object.keys(validation.errors)[0];
+      if (firstError === 'username') {
+        showValidationError('username');
+      } else if (firstError === 'email') {
+        showValidationError('email');
+      } else if (firstError === 'password') {
+        showValidationError('password');
+      } else {
+        showValidationError('required');
+      }
+      
       return;
     }
     
@@ -66,6 +80,9 @@ const RegisterForm = ({ onSuccess, redirectTo = '/dashboard' }) => {
       });
       
       if (result.success) {
+        // Show success toast
+        showAuthSuccess('register');
+        
         if (onSuccess) {
           onSuccess(result.data);
         } else {
@@ -86,10 +103,19 @@ const RegisterForm = ({ onSuccess, redirectTo = '/dashboard' }) => {
             }
           });
           setFormErrors(backendErrors);
+          
+          // Show error toast
+          showAuthError(result.error || 'Registration failed');
+        } else {
+          // Show generic error toast
+          showAuthError(result.error || 'Registration failed');
         }
       }
     } catch (error) {
       console.error('Registration error:', error);
+      
+      // Show generic error toast
+      showAuthError(error.message || 'An unexpected error occurred');
     }
   };
 

@@ -7,6 +7,7 @@ import {
   formatDuration,
   getPointsForActivity
 } from '../../utils/activityData';
+import { showActivitySuccess } from '../../utils/toast';
 
 const ActivityCard = ({ 
   activity, 
@@ -21,6 +22,16 @@ const ActivityCard = ({
   const icon = getActivityIcon(activity);
   const color = getActivityColor(activity);
   const points = getPointsForActivity(activity);
+
+  const handleStartActivity = () => {
+    // Show activity start toast
+    showActivitySuccess('start', activity.name);
+    
+    // Call the original handler
+    if (onStartActivity) {
+      onStartActivity(activity);
+    }
+  };
 
   return (
     <div className={`bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 border border-gray-200 ${className}`}>
@@ -115,7 +126,7 @@ const ActivityCard = ({
         {/* Action Buttons */}
         <div className="flex space-x-2">
           <button
-            onClick={() => onStartActivity(activity)}
+            onClick={handleStartActivity}
             className="flex-1 bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors duration-200 text-sm font-medium"
           >
             Start Activity

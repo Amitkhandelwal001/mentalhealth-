@@ -1,5 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Auth Context Provider
 import { AuthProvider } from './context/AuthContext';
@@ -45,6 +47,24 @@ function App() {
             {/* Catch all route - redirect to home */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          
+          {/* Toast Container - positioned at top right */}
+          <ToastContainer
+            position="top-right"
+            autoClose={4000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+            className="toast-container"
+            toastClassName="toast-custom"
+            bodyClassName="toast-body"
+            progressClassName="toast-progress"
+          />
         </div>
       </Router>
     </AuthProvider>

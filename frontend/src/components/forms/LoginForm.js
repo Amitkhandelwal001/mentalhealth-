@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { validateLoginForm } from '../../utils/auth';
+import { showAuthSuccess, showAuthError, showValidationError } from '../../utils/toast';
 
 const LoginForm = ({ onSuccess, redirectTo = '/dashboard' }) => {
   const { login, isLoading, error } = useAuth();
@@ -39,6 +40,17 @@ const LoginForm = ({ onSuccess, redirectTo = '/dashboard' }) => {
     const validation = validateLoginForm(formData);
     if (!validation.isValid) {
       setFormErrors(validation.errors);
+      
+      // Show validation error toast
+      const firstError = Object.keys(validation.errors)[0];
+      if (firstError === 'emailOrUsername') {
+        showValidationError('email');
+      } else if (firstError === 'password') {
+        showValidationError('password');
+      } else {
+        showValidationError('required');
+      }
+      
       return;
     }
     
@@ -48,6 +60,9 @@ const LoginForm = ({ onSuccess, redirectTo = '/dashboard' }) => {
       const result = await login(formData);
       
       if (result.success) {
+        // Show success toast
+        showAuthSuccess('login');
+        
         if (onSuccess) {
           onSuccess(result.data);
         } else {
@@ -55,11 +70,14 @@ const LoginForm = ({ onSuccess, redirectTo = '/dashboard' }) => {
           console.log('Login successful');
         }
       } else {
-        // Error is already handled by the context
-        console.error('Login failed:', result.error);
+        // Show error toast
+        showAuthError(result.error || 'Login failed');
       }
     } catch (error) {
       console.error('Login error:', error);
+      
+      // Show generic error toast
+      showAuthError(error.message || 'An unexpected error occurred');
     }
   };
 
@@ -78,7 +96,7 @@ const LoginForm = ({ onSuccess, redirectTo = '/dashboard' }) => {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Global Error */}
+          {/* Global Error - Keep for immediate feedback */}
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <div className="flex">

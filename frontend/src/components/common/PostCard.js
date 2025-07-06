@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { communityAPI } from '../../utils/api';
 import { formatTimeAgo, truncateText, getCategoryInfo, formatPostStats } from '../../utils/communityData';
+import { showCommunitySuccess, showCommunityError, showQuickSuccess } from '../../utils/toast';
 
 const PostCard = ({ post, onLike, onFlag, showFullContent = false }) => {
   const navigate = useNavigate();
@@ -31,8 +32,13 @@ const PostCard = ({ post, onLike, onFlag, showFullContent = false }) => {
         const responseData = response.data.data || response.data;
         onLike(post._id, responseData.liked, responseData.likes);
       }
+      
+      // Show quick success toast
+      showQuickSuccess(post.isLiked ? 'Like removed' : 'Liked!');
+      
     } catch (error) {
       console.error('Error liking post:', error);
+      showCommunityError('Failed to like post');
     } finally {
       setIsLiking(false);
     }
@@ -53,11 +59,13 @@ const PostCard = ({ post, onLike, onFlag, showFullContent = false }) => {
       if (onFlag) {
         onFlag(post._id);
       }
-      // Show success message
-      alert('Post has been flagged for review. Thank you for helping keep our community safe.');
+      
+      // Show success toast
+      showCommunitySuccess('flag');
+      
     } catch (error) {
       console.error('Error flagging post:', error);
-      alert('Error flagging post. Please try again.');
+      showCommunityError('Failed to flag post');
     } finally {
       setIsFlagging(false);
     }

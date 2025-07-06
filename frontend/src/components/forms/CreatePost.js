@@ -8,6 +8,7 @@ import {
   containsCrisisKeywords, 
   crisisResources 
 } from '../../utils/communityData';
+import { showCommunitySuccess, showCommunityError, showValidationError, showCrisisAlert } from '../../utils/toast';
 
 const CreatePost = ({ onPostCreated, onCancel }) => {
   const { user } = useAuth();
@@ -33,6 +34,11 @@ const CreatePost = ({ onPostCreated, onCancel }) => {
     if (name === 'content' || name === 'title') {
       const hasCrisisKeywords = containsCrisisKeywords(value);
       setShowCrisisHelp(hasCrisisKeywords);
+      
+      // Show crisis alert toast if keywords detected
+      if (hasCrisisKeywords && !showCrisisHelp) {
+        showCrisisAlert();
+      }
     }
 
     // Clear errors when user starts typing
@@ -72,6 +78,16 @@ const CreatePost = ({ onPostCreated, onCancel }) => {
     const validation = validatePost(formData.title, formData.content);
     if (!validation.isValid) {
       setErrors(validation.errors);
+      
+      // Show validation error toast
+      if (validation.errors.some(err => err.includes('title'))) {
+        showValidationError('required');
+      } else if (validation.errors.some(err => err.includes('content'))) {
+        showValidationError('content');
+      } else {
+        showValidationError('required');
+      }
+      
       return;
     }
 
@@ -83,7 +99,11 @@ const CreatePost = ({ onPostCreated, onCancel }) => {
       // Show crisis resources if returned
       if (response.crisisResources) {
         setShowCrisisHelp(true);
+        showCrisisAlert();
       }
+
+      // Show success toast
+      showCommunitySuccess('post');
 
       // Reset form
       setFormData({
@@ -101,16 +121,17 @@ const CreatePost = ({ onPostCreated, onCancel }) => {
         onPostCreated(responseData.post);
       }
 
-      // Show success message
-      alert('Post created successfully!');
-
     } catch (error) {
       console.error('Error creating post:', error);
       
       if (error.response?.data?.reasons) {
-        setErrors(['Content contains inappropriate language and cannot be posted']);
+        const errorMessage = 'Content contains inappropriate language and cannot be posted';
+        setErrors([errorMessage]);
+        showCommunityError(errorMessage);
       } else {
-        setErrors([error.response?.data?.error || 'Failed to create post']);
+        const errorMessage = error.response?.data?.error || 'Failed to create post';
+        setErrors([errorMessage]);
+        showCommunityError(errorMessage);
       }
     } finally {
       setIsSubmitting(false);
