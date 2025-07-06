@@ -6,7 +6,6 @@ A comprehensive digital platform offering mood tracking, AI-driven personalized 
 
 - **Platform**: Web application (responsive design)
 - **Team**: 3 beginner developers
-- **Timeline**: 10 weeks (Currently in Week 7+ - Community Features Complete)
 - **Tech Stack**: React.js + Node.js/Express + MongoDB Atlas
 - **Deployment**: Vercel (Frontend) + Render (Backend)
 
@@ -334,27 +333,3 @@ If you encounter port conflicts, it's likely due to macOS AirPlay using port 500
 - Mobile performance score: 90+
 - Accessibility score: 95+
 - SEO optimization: 100%
-
-## 🤝 Contributing
-
-1. Follow the TODO.md roadmap
-2. Create feature branches from main
-3. Write tests for new features
-4. Follow the coding standards
-5. Update documentation as needed
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🙏 Acknowledgments
-
-- Mental health resources provided by NAMI, Crisis Text Line, and other organizations
-- Design inspiration from modern wellness applications
-- Community feedback and testing
-
----
-
-**For technical support**: [Create an issue](https://github.com/your-repo/issues)  
-**For deployment help**: See [DEPLOYMENT.md](./docs/DEPLOYMENT.md)  
-**For user questions**: See [USER_GUIDE.md](./docs/USER_GUIDE.md) 
