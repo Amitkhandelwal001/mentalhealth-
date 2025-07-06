@@ -10,7 +10,8 @@ const {
   updateMoodEntry,
   deleteMoodEntry,
   getMoodStats,
-  getMoodTrends
+  getMoodTrends,
+  getDashboardData
 } = require('../controllers/moodController');
 
 // Import auth middleware
@@ -156,6 +157,13 @@ router.post('/', validateMoodEntry, createMoodEntry);
  * @access  Private
  */
 router.get('/', validateMoodQuery, getMoodEntries);
+
+/**
+ * @route   GET /api/mood/dashboard
+ * @desc    Get dashboard data for the current user
+ * @access  Private
+ */
+router.get('/dashboard', validateStatsQuery, getDashboardData);
 
 /**
  * @route   GET /api/mood/stats

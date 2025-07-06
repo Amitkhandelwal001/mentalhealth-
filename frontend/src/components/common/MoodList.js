@@ -8,7 +8,8 @@ const MoodList = ({
   showActions = false, 
   onEdit, 
   onDelete,
-  refreshTrigger = 0 
+  refreshTrigger = 0,
+  customData = null // New prop for custom data
 }) => {
   const [moodEntries, setMoodEntries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -52,11 +53,20 @@ const MoodList = ({
   }, [limit]);
 
   useEffect(() => {
-    fetchMoodEntries();
-  }, [refreshTrigger, fetchMoodEntries]);
+    // If custom data is provided, use it instead of fetching
+    if (customData) {
+      setMoodEntries(Array.isArray(customData) ? customData : []);
+      setLoading(false);
+      setHasMore(false); // No pagination for custom data
+    } else {
+      fetchMoodEntries();
+    }
+  }, [refreshTrigger, fetchMoodEntries, customData]);
 
   const handleLoadMore = () => {
-    fetchMoodEntries(page + 1, true);
+    if (!customData) {
+      fetchMoodEntries(page + 1, true);
+    }
   };
 
   const handleEdit = async (moodEntry) => {
@@ -149,8 +159,8 @@ const MoodList = ({
         />
       ))}
 
-      {/* Load more button */}
-      {hasMore && (
+      {/* Load more button - only show if not using custom data */}
+      {hasMore && !customData && (
         <div className="text-center pt-4">
           <button
             onClick={handleLoadMore}
@@ -162,8 +172,8 @@ const MoodList = ({
         </div>
       )}
 
-      {/* No more entries message */}
-      {!hasMore && moodEntries && moodEntries.length > 5 && (
+      {/* No more entries message - only show if not using custom data */}
+      {!hasMore && !customData && moodEntries && moodEntries.length > 5 && (
         <div className="text-center pt-4">
           <p className="text-gray-500 text-sm">You've reached the end of your mood history</p>
         </div>

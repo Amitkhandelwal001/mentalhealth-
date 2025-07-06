@@ -78,15 +78,18 @@ const userSchema = new mongoose.Schema({
     level: {
       type: Number,
       default: 1
+    },
+    totalActivities: {
+      type: Number,
+      default: 0
     }
   }
 }, {
   timestamps: true // Creates createdAt and updatedAt automatically
 });
 
-// Index for performance
-userSchema.index({ email: 1 });
-userSchema.index({ username: 1 });
+// Note: email and username indexes are automatically created by unique: true
+// No need for explicit index definitions
 
 // Hash password before saving
 userSchema.pre('save', async function(next) {

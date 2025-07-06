@@ -394,6 +394,184 @@ const getMoodTrends = async (req, res) => {
   }
 };
 
+/**
+ * Get dashboard data for the current user
+ * GET /api/mood/dashboard
+ */
+const getDashboardData = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { timeframe = '30d' } = req.query;
+
+    // Get user stats
+    const stats = await MoodEntry.getUserStats(userId, timeframe);
+
+    // Get recent mood entries (last 7 days)
+    const last7Days = new Date();
+    last7Days.setDate(last7Days.getDate() - 7);
+
+    const recentEntries = await MoodEntry.find({
+      userId,
+      date: { $gte: last7Days }
+    })
+    .sort({ date: -1 })
+    .limit(10)
+    .select('moodScore date timeOfDay notes tags createdAt')
+    .lean();
+
+    // Get weekly trend data for charts
+    const weeklyTrends = await MoodEntry.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          date: { $gte: last7Days }
+        }
+      },
+      {
+        $group: {
+          _id: '$date',
+          averageMood: { $avg: '$moodScore' },
+          entryCount: { $sum: 1 },
+          moodScores: { $push: '$moodScore' }
+        }
+      },
+      {
+        $sort: { '_id': 1 }
+      }
+    ]);
+
+    // Get monthly trend data
+    const last30Days = new Date();
+    last30Days.setDate(last30Days.getDate() - 30);
+
+    const monthlyTrends = await MoodEntry.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          date: { $gte: last30Days }
+        }
+      },
+      {
+        $group: {
+          _id: { 
+            year: { $year: '$date' },
+            month: { $month: '$date' },
+            day: { $dayOfMonth: '$date' }
+          },
+          averageMood: { $avg: '$moodScore' },
+          entryCount: { $sum: 1 },
+          morningMood: { $avg: { $cond: [{ $eq: ['$timeOfDay', 'morning'] }, '$moodScore', null] } },
+          afternoonMood: { $avg: { $cond: [{ $eq: ['$timeOfDay', 'afternoon'] }, '$moodScore', null] } },
+          eveningMood: { $avg: { $cond: [{ $eq: ['$timeOfDay', 'evening'] }, '$moodScore', null] } }
+        }
+      },
+      {
+        $sort: { '_id': 1 }
+      }
+    ]);
+
+    // Get mood distribution
+    const moodDistribution = await MoodEntry.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          date: { $gte: last30Days }
+        }
+      },
+      {
+        $group: {
+          _id: '$moodScore',
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { '_id': 1 }
+      }
+    ]);
+
+    // Get user's current streak and other stats
+    const user = await User.findById(userId).select('stats profile');
+
+    // Calculate insights
+    const insights = [];
+    
+    // Streak insight
+    if (user.stats.currentStreak >= 7) {
+      insights.push({
+        type: 'positive',
+        message: `Great job! You've maintained a ${user.stats.currentStreak}-day streak!`,
+        icon: '🔥'
+      });
+    }
+
+    // Mood trend insight
+    if (weeklyTrends.length >= 3) {
+      const recentAvg = weeklyTrends.slice(-3).reduce((sum, day) => sum + day.averageMood, 0) / 3;
+      const earlierAvg = weeklyTrends.slice(0, 3).reduce((sum, day) => sum + day.averageMood, 0) / 3;
+      
+      if (recentAvg > earlierAvg + 0.5) {
+        insights.push({
+          type: 'positive',
+          message: 'Your mood has been improving over the past few days!',
+          icon: '📈'
+        });
+      } else if (recentAvg < earlierAvg - 0.5) {
+        insights.push({
+          type: 'suggestion',
+          message: 'Consider trying some self-care activities to boost your mood.',
+          icon: '🌱'
+        });
+      }
+    }
+
+    // Check-in consistency insight
+    if (stats.totalEntries >= 14) {
+      const consistencyRate = (stats.totalEntries / 30) * 100;
+      if (consistencyRate >= 70) {
+        insights.push({
+          type: 'positive',
+          message: 'You\'re doing great at tracking your mood consistently!',
+          icon: '✅'
+        });
+      }
+    }
+
+    res.json({
+      success: true,
+      data: {
+        stats: {
+          ...stats,
+          currentStreak: user?.stats?.currentStreak || 0,
+          longestStreak: user?.stats?.longestStreak || 0,
+          totalCheckIns: user?.stats?.totalCheckIns || 0,
+          points: user?.stats?.points || 0,
+          level: user?.stats?.level || 1
+        },
+        trends: {
+          weekly: weeklyTrends,
+          monthly: monthlyTrends,
+          distribution: moodDistribution
+        },
+        recentEntries,
+        insights,
+        timeframe,
+        user: {
+          displayName: user?.profile?.displayName || user?.username,
+          joinDate: user?.profile?.joinDate
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Get dashboard data error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve dashboard data',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
+};
+
 module.exports = {
   createMoodEntry,
   getMoodEntries,
@@ -401,5 +579,6 @@ module.exports = {
   updateMoodEntry,
   deleteMoodEntry,
   getMoodStats,
-  getMoodTrends
+  getMoodTrends,
+  getDashboardData
 }; 

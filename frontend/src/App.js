@@ -11,6 +11,12 @@ import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import MoodCheckInPage from './pages/MoodCheckInPage';
 import MoodHistoryPage from './pages/MoodHistoryPage';
+import ActivitiesPage from './pages/ActivitiesPage';
+import ActivityDetailPage from './pages/ActivityDetailPage';
+import ActivityHistoryPage from './pages/ActivityHistoryPage';
+import CommunityPage from './pages/CommunityPage';
+import PostDetailPage from './pages/PostDetailPage';
+import GetHelpPage from './pages/GetHelpPage';
 
 function App() {
   return (
@@ -29,6 +35,12 @@ function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/mood-checkin" element={<MoodCheckInPage />} />
             <Route path="/mood-history" element={<MoodHistoryPage />} />
+            <Route path="/activities" element={<ActivitiesPage />} />
+            <Route path="/activities/history" element={<ActivityHistoryPage />} />
+            <Route path="/activities/:id" element={<ActivityDetailPage />} />
+            <Route path="/community" element={<CommunityPage />} />
+            <Route path="/community/posts/:id" element={<PostDetailPage />} />
+            <Route path="/get-help" element={<GetHelpPage />} />
             
             {/* Catch all route - redirect to home */}
             <Route path="*" element={<Navigate to="/" replace />} />

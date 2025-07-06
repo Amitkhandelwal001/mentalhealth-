@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { moodAPI, handleApiError } from '../utils/api';
 import MoodList from '../components/common/MoodList';
 import MoodCheckIn from '../components/forms/MoodCheckIn';
+import Navigation from '../components/common/Navigation';
+import ProtectedRoute from '../components/common/ProtectedRoute';
 
 const MoodHistoryPage = () => {
-  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalEntries: 0,
     currentStreak: 0,
@@ -22,6 +23,7 @@ const MoodHistoryPage = () => {
     const fetchStats = async () => {
       try {
         setLoading(true);
+        setError(''); // Clear any previous errors
         const response = await moodAPI.getMoodStats();
         if (response.data.success) {
           setStats({
@@ -30,10 +32,10 @@ const MoodHistoryPage = () => {
             averageMood: response.data.data.averageMood || 0
           });
         }
-      } catch (error) {
-        console.error('Error fetching mood stats:', error);
-        const errorMessage = handleApiError(error);
-        setError(errorMessage);
+      } catch (err) {
+        console.error('Error fetching mood stats:', err);
+        const errorMessage = handleApiError(err);
+        setError(errorMessage.message || 'Failed to load mood statistics');
       } finally {
         setLoading(false);
       }
@@ -67,159 +69,173 @@ const MoodHistoryPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <Link 
-              to="/dashboard" 
-              className="flex items-center text-gray-600 hover:text-gray-800 transition-colors"
-            >
-              <span className="text-xl mr-2">←</span>
-              <span>Back to Dashboard</span>
-            </Link>
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          {/* Error Display */}
+          {error && (
+            <div className="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
+              <div className="flex items-center">
+                <span className="text-red-600 mr-2">⚠️</span>
+                <span>{error}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <Link 
+                to="/dashboard" 
+                className="flex items-center text-gray-600 hover:text-gray-800 transition-colors"
+              >
+                <span className="text-xl mr-2">←</span>
+                <span>Back to Dashboard</span>
+              </Link>
+              
+              <Link 
+                to="/mood-checkin"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                + New Entry
+              </Link>
+            </div>
             
-            <Link 
-              to="/mood-checkin"
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              + New Entry
-            </Link>
+            <div className="text-center">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Your Mood Journey
+              </h1>
+              <p className="text-gray-600">
+                Track your emotional patterns and celebrate your progress
+              </p>
+            </div>
           </div>
-          
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Your Mood Journey
-            </h1>
-            <p className="text-gray-600">
-              Track your emotional patterns and celebrate your progress
+
+          {/* Mood Stats Summary */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span className="text-2xl">📊</span>
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-sm font-medium text-gray-500">Total Entries</h3>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {loading ? '...' : stats.totalEntries}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                  <span className="text-2xl">🔥</span>
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-sm font-medium text-gray-500">Current Streak</h3>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {loading ? '...' : `${stats.currentStreak} day${stats.currentStreak !== 1 ? 's' : ''}`}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                  <span className="text-2xl">😊</span>
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-sm font-medium text-gray-500">Average Mood</h3>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {loading ? '...' : (stats.averageMood ? `${stats.averageMood.toFixed(1)}/5` : 'N/A')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Filter Options */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Filter by Time Period</h3>
+            <div className="flex flex-wrap gap-2">
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm">
+                All Time
+              </button>
+              <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm transition-colors">
+                This Week
+              </button>
+              <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm transition-colors">
+                This Month
+              </button>
+              <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm transition-colors">
+                Last 3 Months
+              </button>
+            </div>
+          </div>
+
+          {/* Mood History List */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Mood History
+              </h2>
+              <div className="text-sm text-gray-500">
+                Most recent first
+              </div>
+            </div>
+            
+            <MoodList 
+              showActions={true}
+              limit={20}
+              onEdit={handleEdit}
+              onDelete={handleDeleteSuccess}
+              refreshTrigger={refreshTrigger}
+            />
+          </div>
+
+          {/* Insights Section */}
+          <div className="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              💡 Mood Insights
+            </h3>
+            <p className="text-gray-600 text-sm">
+              Keep tracking your mood daily to discover patterns and improve your mental wellness. 
+              Consider the factors that influence your mood and celebrate your progress!
             </p>
           </div>
-        </div>
 
-        {/* Mood Stats Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-2xl">📊</span>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-sm font-medium text-gray-500">Total Entries</h3>
-                <p className="text-2xl font-bold text-gray-900">
-                  {loading ? '...' : stats.totalEntries}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                <span className="text-2xl">🔥</span>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-sm font-medium text-gray-500">Current Streak</h3>
-                <p className="text-2xl font-bold text-gray-900">
-                  {loading ? '...' : `${stats.currentStreak} day${stats.currentStreak !== 1 ? 's' : ''}`}
-                </p>
+          {/* Edit Modal */}
+          {showEditModal && editingEntry && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    Edit Mood Entry
+                  </h3>
+                  <button 
+                    onClick={handleEditCancel}
+                    className="text-gray-400 hover:text-gray-600 text-2xl"
+                  >
+                    ×
+                  </button>
+                </div>
+                
+                <MoodCheckIn 
+                  existingEntry={editingEntry}
+                  onSuccess={handleEditSuccess}
+                  onCancel={handleEditCancel}
+                  isModal={true}
+                />
               </div>
             </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                <span className="text-2xl">😊</span>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-sm font-medium text-gray-500">Average Mood</h3>
-                <p className="text-2xl font-bold text-gray-900">
-                  {loading ? '...' : (stats.averageMood ? `${stats.averageMood.toFixed(1)}/5` : 'N/A')}
-                </p>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
-
-        {/* Filter Options */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Filter by Time Period</h3>
-          <div className="flex flex-wrap gap-2">
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm">
-              All Time
-            </button>
-            <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm transition-colors">
-              This Week
-            </button>
-            <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm transition-colors">
-              This Month
-            </button>
-            <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm transition-colors">
-              Last 3 Months
-            </button>
-          </div>
-        </div>
-
-        {/* Mood History List */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">
-              Mood History
-            </h2>
-            <div className="text-sm text-gray-500">
-              Most recent first
-            </div>
-          </div>
-          
-          <MoodList 
-            showActions={true}
-            limit={20}
-            onEdit={handleEdit}
-            onDelete={handleDeleteSuccess}
-            refreshTrigger={refreshTrigger}
-          />
-        </div>
-
-        {/* Insights Section */}
-        <div className="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            💡 Mood Insights
-          </h3>
-          <p className="text-gray-600 text-sm">
-            Keep tracking your mood daily to discover patterns and improve your mental wellness. 
-            Consider the factors that influence your mood and celebrate your progress!
-          </p>
-        </div>
-
-        {/* Edit Modal */}
-        {showEditModal && editingEntry && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold text-gray-900">
-                  Edit Mood Entry
-                </h3>
-                <button 
-                  onClick={handleEditCancel}
-                  className="text-gray-400 hover:text-gray-600 text-2xl"
-                >
-                  ×
-                </button>
-              </div>
-              
-                             <MoodCheckIn 
-                 existingEntry={editingEntry}
-                 onSuccess={handleEditSuccess}
-                 onCancel={handleEditCancel}
-                 isModal={true}
-               />
-            </div>
-          </div>
-        )}
       </div>
-    </div>
+    </ProtectedRoute>
   );
 };
 

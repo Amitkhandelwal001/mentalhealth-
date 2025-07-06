@@ -335,4 +335,29 @@ export const getMoodRecommendations = (score) => {
   };
   
   return recommendations[score] || recommendations[3];
-}; 
+};
+
+/**
+ * Get mood emoji by score
+ * @param {number} score - Mood score (1-5)
+ * @returns {string} Mood emoji
+ */
+export const getMoodEmoji = (score) => {
+  const mood = getMoodByScore(score);
+  return mood ? mood.emoji : '😐';
+};
+
+/**
+ * Get mood label by score
+ * @param {number} score - Mood score (1-5)
+ * @returns {string} Mood label
+ */
+export const getMoodLabel = (score) => {
+  const mood = getMoodByScore(score);
+  return mood ? mood.label : 'Neutral';
+};
+
+/**
+ * Export mood emojis array for backward compatibility
+ */
+export const moodEmojis = MOOD_OPTIONS; 

@@ -38,10 +38,14 @@ const connectDB = async () => {
 // Import routes
 const authRoutes = require('./routes/auth');
 const moodRoutes = require('./routes/mood');
+const activityRoutes = require('./routes/activities');
+const communityRoutes = require('./routes/community');
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/mood', moodRoutes);
+app.use('/api/activities', activityRoutes);
+app.use('/api/community', communityRoutes);
 
 app.get('/', (req, res) => {
   res.json({ 
@@ -50,7 +54,9 @@ app.get('/', (req, res) => {
     endpoints: {
       health: '/api/health',
       auth: '/api/auth',
-      mood: '/api/mood'
+      mood: '/api/mood',
+      activities: '/api/activities',
+      community: '/api/community'
     }
   });
 });

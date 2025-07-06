@@ -122,4 +122,127 @@ export const handleApiError = (error) => {
       errors: []
     };
   }
+};
+
+// Generic API call function
+export const apiCall = async (endpoint, options = {}) => {
+  try {
+    const { method = 'GET', data = null, params = {} } = options;
+    
+    const config = {
+      method: method.toLowerCase(),
+      url: endpoint,
+      params,
+    };
+    
+    if (data) {
+      config.data = data;
+    }
+    
+    const response = await apiClient(config);
+    return response.data;
+  } catch (error) {
+    throw handleApiError(error);
+  }
+};
+
+// Dashboard API functions
+export const getDashboardData = async (timeframe = '30d') => {
+  try {
+    const response = await apiClient.get(`/mood/dashboard?timeframe=${timeframe}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error);
+    throw error;
+  }
+};
+
+export const getMoodTrends = async (period = 'week') => {
+  try {
+    const response = await apiClient.get(`/mood/trends?period=${period}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching mood trends:', error);
+    throw error;
+  }
+};
+
+export const getMoodStats = async (timeframe = '30d') => {
+  try {
+    const response = await apiClient.get(`/mood/stats?timeframe=${timeframe}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching mood stats:', error);
+    throw error;
+  }
+};
+
+// Activity API endpoints
+export const activityAPI = {
+  // Get all activities with optional filtering
+  getActivities: (params = {}) => 
+    apiClient.get('/activities', { params }),
+  
+  // Get a specific activity
+  getActivity: (id) => 
+    apiClient.get(`/activities/${id}`),
+  
+  // Get recommended activities
+  getRecommendedActivities: (params = {}) => 
+    apiClient.get('/activities/recommendations', { params }),
+  
+  // Mark activity as complete
+  completeActivity: (id, data = {}) => 
+    apiClient.post(`/activities/${id}/complete`, data),
+  
+  // Get user's activity history
+  getActivityHistory: (params = {}) => 
+    apiClient.get('/activities/history', { params }),
+};
+
+// Community API endpoints
+export const communityAPI = {
+  // Get community posts with pagination and filtering
+  getPosts: (params = {}) => 
+    apiClient.get('/community/posts', { params }),
+  
+  // Get a specific post
+  getPost: (id) => 
+    apiClient.get(`/community/posts/${id}`),
+  
+  // Create a new post
+  createPost: (data) => 
+    apiClient.post('/community/posts', data),
+  
+  // Like or unlike a post
+  likePost: (id) => 
+    apiClient.post(`/community/posts/${id}/like`),
+  
+  // Flag a post as inappropriate
+  flagPost: (id, data = {}) => 
+    apiClient.post(`/community/posts/${id}/flag`, data),
+  
+  // Get community statistics
+  getCommunityStats: () => 
+    apiClient.get('/community/stats'),
+  
+  // Add a comment to a post
+  addComment: (postId, data) => 
+    apiClient.post(`/community/posts/${postId}/comments`, data),
+  
+  // Get comments for a post
+  getComments: (postId, params = {}) => 
+    apiClient.get(`/community/posts/${postId}/comments`, { params }),
+  
+  // Like or unlike a comment
+  likeComment: (commentId) => 
+    apiClient.post(`/community/comments/${commentId}/like`),
+  
+  // Flag a comment as inappropriate
+  flagComment: (commentId, data = {}) => 
+    apiClient.post(`/community/comments/${commentId}/flag`, data),
+  
+  // Delete a comment (author only)
+  deleteComment: (commentId) => 
+    apiClient.delete(`/community/comments/${commentId}`),
 }; 
