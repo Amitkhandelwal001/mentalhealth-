@@ -14,6 +14,23 @@ A comprehensive digital platform offering mood tracking, AI-driven personalized 
 - **Frontend**: https://mentalhealth-eta.vercel.app/
 - **Backend API**: https://mentalhealth-1-t8v5.onrender.com
 
+## 🚀 ScreenShots
+<img width="1470" alt="Screenshot 2025-07-06 at 6 15 26 PM" src="https://github.com/user-attachments/assets/4e0de74d-2e7d-4626-a443-9baf5296231a" />
+<img width="1469" alt="Screenshot 2025-07-06 at 6 15 34 PM" src="https://github.com/user-attachments/assets/be8d2396-f91e-45fe-b6f9-ecc4a957d1d7" />
+<img width="1468" alt="Screenshot 2025-07-06 at 6 15 39 PM" src="https://github.com/user-attachments/assets/bc154dc2-7325-4d43-98a0-c5f72e3f493b" />
+<img width="1470" alt="Screenshot 2025-07-06 at 6 15 46 PM" src="https://github.com/user-attachments/assets/583df537-834b-4790-88bd-000857de938f" />
+<img width="798" alt="Screenshot 2025-07-06 at 6 15 55 PM" src="https://github.com/user-attachments/assets/8bee0575-c278-4ef5-b646-8638d5432b07" />
+<img width="535" alt="Screenshot 2025-07-06 at 6 16 16 PM" src="https://github.com/user-attachments/assets/a43b69d5-4c9d-42e6-952d-e00ff122ec80" />
+<img width="1469" alt="Screenshot 2025-07-06 at 6 16 36 PM" src="https://github.com/user-attachments/assets/8db58ae7-ab24-44a3-aa3e-387817b83a66" />
+<img width="1459" alt="Screenshot 2025-07-06 at 6 16 46 PM" src="https://github.com/user-attachments/assets/d395ac17-a879-42ce-ba58-a0aa123f3255" />
+<img width="1059" alt="Screenshot 2025-07-06 at 6 16 59 PM" src="https://github.com/user-attachments/assets/a8a1a37d-4c3c-493c-b22d-5874fe519d9c" />
+<img width="1464" alt="Screenshot 2025-07-06 at 6 17 14 PM" src="https://github.com/user-attachments/assets/8dd9b731-2e99-47d4-9440-6464445f68b0" />
+<img width="1468" alt="Screenshot 2025-07-06 at 6 17 23 PM" src="https://github.com/user-attachments/assets/16ba45c1-88cd-4072-872f-52bc4a259c01" />
+<img width="940" alt="Screenshot 2025-07-06 at 6 17 38 PM" src="https://github.com/user-attachments/assets/a1a0ebe7-d9b3-421a-aeda-43e2029da942" />
+<img width="985" alt="Screenshot 2025-07-06 at 6 17 48 PM" src="https://github.com/user-attachments/assets/5c468418-598d-4a22-9ef4-e21c46f6bb31" />
+<img width="1470" alt="Screenshot 2025-07-06 at 6 18 08 PM" src="https://github.com/user-attachments/assets/f852e8e0-936d-43d8-b26f-baf9a79ec251" />
+
+
 ## 🚀 Quick Start
 
 ### Prerequisites
