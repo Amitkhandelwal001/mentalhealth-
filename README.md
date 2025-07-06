@@ -11,9 +11,8 @@ A comprehensive digital platform offering mood tracking, AI-driven personalized 
 
 ## 🌐 Live Application
 
-- **Frontend**: [https://mindcare-frontend.vercel.app](https://mindcare-frontend.vercel.app) *(Coming Soon)*
-- **Backend API**: [https://mindcare-backend.render.com](https://mindcare-backend.render.com) *(Coming Soon)*
-- **API Documentation**: [https://mindcare-backend.render.com/api/docs](https://mindcare-backend.render.com/api/docs) *(Coming Soon)*
+- **Frontend**: https://mentalhealth-eta.vercel.app/
+- **Backend API**: https://mentalhealth-1-t8v5.onrender.com
 
 ## 🚀 Quick Start
 
